@@ -2,12 +2,12 @@ package dispatcher
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"xlab-feishu-robot/internal/config"
-
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
+	"xlab-feishu-robot/internal/controller"
 )
 
 // @Summary feishu event dispatcher
@@ -97,4 +97,13 @@ func eventRepeatDetect(eventId string) bool {
 		eventIdList[eventId] = true
 		return false
 	}
+}
+
+func ReceiveMsgDispatcher(c *gin.Context) {
+	msgType := c.Param("GetMsgType")
+	switch msgType {
+	case "GetCodeThenGetUserAccessToken":
+		controller.GetCodeThenGetUserAccessToken(c)
+	}
+
 }

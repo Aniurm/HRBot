@@ -6,6 +6,7 @@ import (
 	larkcontact "github.com/larksuite/oapi-sdk-go/v3/service/contact/v3"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 	"github.com/sirupsen/logrus"
+	"regexp"
 	"strings"
 	"xlab-feishu-robot/internal/config"
 	"xlab-feishu-robot/internal/pkg"
@@ -271,17 +272,16 @@ func parsePeopleAndGroup(content string) (people []string, group []string) {
 	// 1. 以.分割
 	tmp := strings.Split(content, ".")
 	peopleStr, groupStr := tmp[1], tmp[2]
-	// 2. 以,分割
-	people = strings.Split(peopleStr, ",")
-	group = strings.Split(groupStr, ",")
-
-	// 3. 去除空格
-	for i := 0; i < len(people); i++ {
-		people[i] = strings.TrimSpace(people[i])
+	// 2. 以, ， \\n 分割
+	re := regexp.MustCompile(`[,，\\n]+`)
+	people = re.Split(peopleStr, -1)
+	group = re.Split(groupStr, -1)
+	// 去除空格
+	for i, name := range people {
+		people[i] = strings.TrimSpace(name)
 	}
-	for i := 0; i < len(group); i++ {
-		group[i] = strings.TrimSpace(group[i])
+	for i, groupName := range group {
+		group[i] = strings.TrimSpace(groupName)
 	}
-
-	return
+	return people, group
 }
